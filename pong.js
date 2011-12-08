@@ -1,16 +1,47 @@
+// =============================================================================
+// Helpers
+
+function vector(x, y) {
+  return {
+    x: x,
+    y: y
+  };
+}
+
+function size(w, h) {
+  return {
+    width: w,
+    height: h
+  };
+}
+
+function rect(x, y, w, h) {
+  return {
+    origin: vector(x, y),
+    size: size(w, h)
+  };
+}
+
+// =============================================================================
+// Game
+
 function Pong(el) {
   this.ctxt = el.getContext('2d');
   this.state = {
+    turn: 0, 
     playing: false,
-    played: 0,
+    gamesPlayed: 0,
     score: {
       playerA: 0,
       playerB: 0
     }
   };
-  this.playerA = {location:{x:10, y:240}};
-  this.playerB = {location:{x:630, y:240}};
-  this.ball    = {location:{x:320, y:240}};
+  this.playerA = {location: rect(50, 210, 10, 20),
+                  velocity: vector(0, 0)};
+  this.playerB = {location: rect(490, 210, 10, 20),
+                  velocity: vector(0, 0)};
+  this.ball    = {location: rect(320, 240, 5, 5),
+                  velocity: vector(0, 0)};
   this.init();
 };
 
@@ -36,26 +67,19 @@ Pong.prototype = {
   },
 
   checkGameState: function() {
-    if(!this.playing) {
-      if(this.played == 5) {
-        this.done();
+    var state = this.state;
+    if(!state.playing) {
+      if(state.gamesPlayed == 5) {
+        state.done();
       } else {
-        this.nextGame();
+        state.playing = true;
+        state.startMatch();
       }
     }
   },
 
-  done: function() {
-  },
-
   startMatch: function() {
-  },
-
-  nextGame: function() {
-    this.ball.location = {x:320, y:240};
-  },
-
-  dropBall: function() {
+    // set the ball to it's initial position
   },
 
   handleKeyPress: function(keyCode) {
@@ -63,23 +87,38 @@ Pong.prototype = {
   },
 
   update: function() {
+    // apply the velocity
   },
 
   checkBall: function() {
+    // check collisions
   },
 
   draw: function() {
-    this.drawPaddle(this.playerA);
-    this.drawPaddle(this.playerB);
-    this.drawBall();
+    var ctxt = this.ctxt;
+    this.clearScreen(ctxt);
+    ctxt.fillStyle = "rgba(255, 255, 255, 1.0)";
+    this.drawPaddle(this.playerA.location);
+    this.drawPaddle(this.playerB.location);
+    this.drawBall(this.ball);
   },
 
-  drawPaddle: function() {
+  clearScreen: function(ctxt) {
+    ctxt.filleStyle = "rgba(0, 0, 0, 1.0)";
+    ctxt.clearRect(0, 0, 640, 480);
+  },
+
+  drawPaddle: function(ctxt, loc) {
+    ctxt.drawRect();
   },
 
   drawBall: function() {
+    ctxt.drawRect();
   }
 };
+
+// =============================================================================
+// Init
 
 function init() {
   console.log("Starting pong.js");
