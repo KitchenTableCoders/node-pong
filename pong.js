@@ -36,11 +36,11 @@ function Pong(el) {
       playerB: 0
     }
   };
-  this.playerA = {location: rect(50, 210, 10, 20),
+  this.playerA = {rect: rect(50, 220, 10, 40),
                   velocity: vector(0, 0)};
-  this.playerB = {location: rect(490, 210, 10, 20),
+  this.playerB = {rect: rect(580, 220, 10, 40),
                   velocity: vector(0, 0)};
-  this.ball    = {location: rect(320, 240, 5, 5),
+  this.ball    = {rect: rect(320, 240, 5, 5),
                   velocity: vector(0, 0)};
   this.init();
 };
@@ -52,7 +52,7 @@ Pong.prototype = {
   },
 
   attachEvents: function() {
-    var self;
+    var self = this;
     // TODO: swap in websocket events
     window.addEventListener("keydown", function(e) {
       self.handleKeyPress(e.keyCode);
@@ -63,7 +63,8 @@ Pong.prototype = {
     this.checkGameState();
     this.update();
     this.draw();
-    setTimeout(function() { self.runLoop() }, 33);
+    var self = this;
+    setTimeout(function() { self.runLoop(); }, 33);
   },
 
   checkGameState: function() {
@@ -73,7 +74,7 @@ Pong.prototype = {
         state.done();
       } else {
         state.playing = true;
-        state.startMatch();
+        this.startMatch();
       }
     }
   },
@@ -98,22 +99,19 @@ Pong.prototype = {
     var ctxt = this.ctxt;
     this.clearScreen(ctxt);
     ctxt.fillStyle = "rgba(255, 255, 255, 1.0)";
-    this.drawPaddle(this.playerA.location);
-    this.drawPaddle(this.playerB.location);
-    this.drawBall(this.ball);
+    this.drawRect(ctxt, this.playerA.rect); // draw paddles
+    this.drawRect(ctxt, this.playerB.rect);
+    this.drawRect(ctxt, this.ball.rect);    // draw ball
   },
 
   clearScreen: function(ctxt) {
-    ctxt.filleStyle = "rgba(0, 0, 0, 1.0)";
-    ctxt.clearRect(0, 0, 640, 480);
+    ctxt.fillStyle = "rgba(0, 0, 0, 1.0)";
+    ctxt.fillRect(0, 0, 640, 480);
   },
 
-  drawPaddle: function(ctxt, loc) {
-    ctxt.drawRect();
-  },
-
-  drawBall: function() {
-    ctxt.drawRect();
+  drawRect: function(ctxt, rect) {
+    ctxt.fillRect(rect.origin.x, rect.origin.y,
+                  rect.size.width, rect.size.height);
   }
 };
 
@@ -122,5 +120,5 @@ Pong.prototype = {
 
 function init() {
   console.log("Starting pong.js");
-  var game = new Pong($('pong'));
+  var game = new Pong(document.getElementById("pong"));
 };
