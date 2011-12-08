@@ -136,7 +136,22 @@ Pong.prototype = {
   },
 
   checkBall: function() {
-    // check collisions
+    var state = this.state;
+    if(state.playing && ball.rect.origin.x < -5) {
+      state.score.playerA++;
+      state.gamesPlayed++;
+      state.playing = false;
+    } else if(state.playing && ball.rect.origin.x > 640) {
+      state.score.playerB++;
+      state.gamesPlayed++;
+      state.playing = false;
+    } else if(this.serve != "A" && collision(this.playerA.rect, this.ball.rect)) {
+      this.state.serve = "A";
+      this.ball.velocity.x *= -1;
+    } else if(this.serve != "B" && collision(this.playerB.rect, this.ball.rect)) {
+      this.state.serve = "B";
+      this.ball.velocity.x *= -1;
+    }
   },
 
   draw: function() {
