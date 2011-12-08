@@ -1,10 +1,24 @@
 // =============================================================================
 // Helpers
 
+var controls = {
+  A_UP: 87,
+  A_DOWN: 83,
+  B_UP: 79,
+  B_DOWN: 76
+};
+
 function vector(x, y) {
   return {
     x: x,
     y: y
+  };
+}
+
+function vadd(v1, v2) {
+  return {
+    x: v1.x+v2.x,
+    y: v1.y+v2.y
   };
 }
 
@@ -37,11 +51,11 @@ function Pong(el) {
     }
   };
   this.playerA = {rect: rect(50, 220, 10, 40),
-                  velocity: vector(0, 0)};
+                  velocity: 0};
   this.playerB = {rect: rect(580, 220, 10, 40),
-                  velocity: vector(0, 0)};
+                  velocity: 0};
   this.ball    = {rect: rect(320, 240, 5, 5),
-                  velocity: vector(0, 0)};
+                  velocity: 0};
   this.init();
 };
 
@@ -84,11 +98,41 @@ Pong.prototype = {
   },
 
   handleKeyPress: function(keyCode) {
-    console.log(keyCode);
+    switch(keyCode) {
+      case controls.A_UP:
+        this.playerA.velocity = -10;
+        break;
+      case controls.A_DOWN:
+        this.playerA.velocity = 10;
+        break;
+      case controls.B_UP:
+        this.playerB.velocity = -10;
+        break;
+      case controls.B_DOWN:
+        this.playerB.velocity = 10;
+        break;
+      default:
+        break;
+    }
   },
 
   update: function() {
-    // apply the velocity
+    var pA = this.playerA,
+        pB = this.playerB;
+    pA.rect.origin.y = this.bound(pA.rect.origin.y+pA.velocity, 0, 480);
+    pA.velocity = 0;
+    pB.rect.origin.y = this.bound(pB.rect.origin.y+pB.velocity, 0, 480);
+    pB.velocity = 0;
+  },
+
+  bound: function(n, lower, upper) {
+    if(n < lower) {
+      return lower;
+    } else if(n > upper) {
+      return upper;
+    } else {
+      return n;
+    }
   },
 
   checkBall: function() {
