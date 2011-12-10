@@ -94,7 +94,9 @@ Pong.prototype = {
   },
 
   startMatch: function() {
-    // set the ball to it's initial position
+    console.log("start match");
+    this.ball.rect.origin = vector(320, 240);
+    this.ball.velocity = vector(5, 5);
   },
 
   handleKeyPress: function(keyCode) {
@@ -118,11 +120,14 @@ Pong.prototype = {
 
   update: function() {
     var pA = this.playerA,
-        pB = this.playerB;
+        pB = this.playerB,
+        ball = this.ball;
     pA.rect.origin.y = this.bound(pA.rect.origin.y+pA.velocity, 0, 480);
     pA.velocity = 0;
     pB.rect.origin.y = this.bound(pB.rect.origin.y+pB.velocity, 0, 480);
     pB.velocity = 0;
+    ball.rect.origin = vadd(ball.rect.origin, ball.velocity);
+    this.checkBall();
   },
 
   bound: function(n, lower, upper) {
@@ -135,8 +140,16 @@ Pong.prototype = {
     }
   },
 
+  collision: function(ra, rb) {
+    return (ra.origin.x < rb.origin.x+rb.size.width) && (ra.origin.x+ra.size.width > rb.origin.x) &&
+           (ra.origin.y < rb.origin.y+rb.size.height) && (ra.origin.y+ra.size.height > rb.origin.y);
+  },
+
   checkBall: function() {
-    var state = this.state;
+    var state = this.state,
+        playerA = this.playerA,
+        playerB = this.playerB,
+        ball = this.ball;
     if(state.playing && ball.rect.origin.x < -5) {
       state.score.playerA++;
       state.gamesPlayed++;
@@ -145,12 +158,14 @@ Pong.prototype = {
       state.score.playerB++;
       state.gamesPlayed++;
       state.playing = false;
-    } else if(this.serve != "A" && collision(this.playerA.rect, this.ball.rect)) {
-      this.state.serve = "A";
-      this.ball.velocity.x *= -1;
-    } else if(this.serve != "B" && collision(this.playerB.rect, this.ball.rect)) {
-      this.state.serve = "B";
-      this.ball.velocity.x *= -1;
+    } else if(state.serve != "A" && this.collision(playerA.rect, ball.rect)) {
+      state.serve = "A";
+      ball.velocity.x *= -1;
+    } else if(state.serve != "B" && this.collision(playerB.rect, ball.rect)) {
+      state.serve = "B";
+      ball.velocity.x *= -1;
+    } else if(this.ball.rect.origin.y < 0 || ball.rect.origin.y > 475) {
+      ball.velocity.y *= -1;
     }
   },
 
