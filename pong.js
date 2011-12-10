@@ -122,9 +122,9 @@ Pong.prototype = {
     var pA = this.playerA,
         pB = this.playerB,
         ball = this.ball;
-    pA.rect.origin.y = this.bound(pA.rect.origin.y+pA.velocity, 0, 480);
+    pA.rect.origin.y = this.bound(pA.rect.origin.y+pA.velocity, 0, 440);
     pA.velocity = 0;
-    pB.rect.origin.y = this.bound(pB.rect.origin.y+pB.velocity, 0, 480);
+    pB.rect.origin.y = this.bound(pB.rect.origin.y+pB.velocity, 0, 440);
     pB.velocity = 0;
     ball.rect.origin = vadd(ball.rect.origin, ball.velocity);
     this.checkBall();
@@ -141,8 +141,13 @@ Pong.prototype = {
   },
 
   collision: function(ra, rb) {
-    return (ra.origin.x < rb.origin.x+rb.size.width) && (ra.origin.x+ra.size.width > rb.origin.x) &&
-           (ra.origin.y < rb.origin.y+rb.size.height) && (ra.origin.y+ra.size.height > rb.origin.y);
+    return (ra.origin.x < rb.origin.x+rb.size.width) &&
+           (ra.origin.x+ra.size.width > rb.origin.x) &&
+           (ra.origin.y < rb.origin.y+rb.size.height) &&
+           (ra.origin.y+ra.size.height > rb.origin.y);
+  },
+
+  checkPaddle: function(rect) {
   },
 
   checkBall: function() {
