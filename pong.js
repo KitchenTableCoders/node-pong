@@ -97,6 +97,9 @@ Pong.prototype = {
     console.log("start match");
     this.ball.rect.origin = vector(320, 240);
     this.ball.velocity = vector(5, 5);
+    if(this.state.turn) {
+      this.ball.velocity.x *= -1;
+    }
   },
 
   handleKeyPress: function(keyCode) {
@@ -107,7 +110,7 @@ Pong.prototype = {
       case controls.A_DOWN:
         this.playerA.velocity = 10;
         break;
-      case controls.B_UP:
+     case controls.B_UP:
         this.playerB.velocity = -10;
         break;
       case controls.B_DOWN:
@@ -147,9 +150,6 @@ Pong.prototype = {
            (ra.origin.y+ra.size.height > rb.origin.y);
   },
 
-  checkPaddle: function(rect) {
-  },
-
   checkBall: function() {
     var state = this.state,
         playerA = this.playerA,
@@ -158,10 +158,12 @@ Pong.prototype = {
     if(state.playing && ball.rect.origin.x < -5) {
       state.score.playerA++;
       state.gamesPlayed++;
+      state.turn = state.turn ? 0 : 1;
       state.playing = false;
     } else if(state.playing && ball.rect.origin.x > 640) {
       state.score.playerB++;
       state.gamesPlayed++;
+      state.turn = state.turn ? 0 : 1;
       state.playing = false;
     } else if(state.serve != "A" && this.collision(playerA.rect, ball.rect)) {
       state.serve = "A";
