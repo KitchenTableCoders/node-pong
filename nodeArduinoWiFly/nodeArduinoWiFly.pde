@@ -21,11 +21,17 @@ int vert = 0;
 int hor = 0;
 bool push;
 
-char* ssid = "network";
-char* pass = "password";
+char* ssid = "Vibromonk2";
+char* pass = "VibroMorgan7183881113";
 
-char* serverAddress = "10.0.50.116";
-int serverPort = 1337;
+//char* ssid = "vibromonk";
+//char* pass = "7183880101";
+
+//char* serverAddress = "10.0.50.116";
+//char* serverAddress = "melville.westell.com";
+char* serverAddress = "10.0.50.117";
+//int serverPort = 1337;
+int serverPort = 5001;
 
 Client client(serverAddress, serverPort);
 
