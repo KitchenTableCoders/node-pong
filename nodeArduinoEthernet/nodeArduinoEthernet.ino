@@ -17,6 +17,9 @@
 int vert = 0;
 int hor = 0;
 bool push;
+bool win = false;
+bool lose = false;
+unsigned long eventTime;
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -28,6 +31,8 @@ byte ip[] = {
 // Enter the IP address of the server you're connecting to:
 byte server[] = { 
   192,168,1,103 }; 
+
+String buffer = "";
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
@@ -68,6 +73,7 @@ void setup() {
   } else {
     Serial.println("connection failed");
   }
+  eventTime = millis();
 }
 
 void loop()
@@ -76,7 +82,12 @@ void loop()
   hor = analogRead(PIN_HOR);
   push = digitalRead(PIN_PUSH);
   
-  digitalWrite(PIN_LED_RED, !push);
+  if(millis() - eventTime > 2000){
+    digitalWrite(PIN_LED_RED, LOW);
+    digitalWrite(PIN_LED_GRN, LOW);
+  }
+  
+  //digitalWrite(PIN_LED_RED, !push);
   
 //  Serial.print(vert);
 //  Serial.print('\t');
@@ -95,10 +106,29 @@ void loop()
   
   // if there are incoming bytes available 
   // from the server, read them and print them:
-//  if (client.available()) {
-//    char c = client.read();
-//    Serial.print(c);
-//  }
+  if (client.available()) {
+    char c = client.read();
+    Serial.print(c);
+    if(c == '\n'){
+      // parse buffer
+      if(buffer == "win"){
+        win = true;
+        Serial.println("got win");
+        digitalWrite(PIN_LED_GRN, HIGH);
+        eventTime = millis();
+      }
+      if(buffer == "lose"){
+        lose = true;
+        Serial.println("got lose");
+        digitalWrite(PIN_LED_RED, HIGH);
+        eventTime = millis();
+      }
+    } else {
+      // add to buffer
+      buffer += c;
+    }
+    //Serial.print(c);
+  }
 //
 //  // as long as there are bytes in the serial queue,
 //  // read them and send them out the socket if it's open:
@@ -110,13 +140,13 @@ void loop()
 //  }
 
   // if the server's disconnected, stop the client:
-//  if (!client.connected()) {
-//    Serial.println();
-//    Serial.println("disconnecting.");
-//    client.stop();
-//    // do nothing:
-//    while(true);
-//  }
+  if (!client.connected()) {
+    //Serial.println();
+    //Serial.println("disconnecting.");
+    client.stop();
+    // do nothing:
+    while(true);
+  }
 }
 
 
