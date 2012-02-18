@@ -1,10 +1,10 @@
 var net = require('net');
 
 var server = net.createServer(function(c) {
-  console.log("Server connected");
+  console.log("Client "+c.remoteAddress+" connected");
+  
   c.setEncoding('ascii');
   c.on("data", function(data) {
-  	//data.setEncoding('utf8');
     console.log("data:", data);
   });
   c.on("end", function() {
@@ -13,5 +13,5 @@ var server = net.createServer(function(c) {
 });
 
 server.listen(5001, function() {
-  console.log("Server bound");
+  console.log("Server bound at localhost:5001");
 });

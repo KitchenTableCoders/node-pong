@@ -27,7 +27,7 @@ byte ip[] = {
 
 // Enter the IP address of the server you're connecting to:
 byte server[] = { 
-  192,168,1,109 }; 
+  192,168,1,103 }; 
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
