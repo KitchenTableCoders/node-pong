@@ -1,15 +1,13 @@
 // =============================================================================
 // Helpers
 
-var socket = io.connect('http://localhost:8181');
+var socket = io.connect('http://10.0.25.103:8181');
 
 console.log(socket);
 
 var controls = {
-  A_UP: 87, // W
-  A_DOWN: 83, // S
-  B_UP: 79, // O
-  B_DOWN: 76 // L
+  UP: 38,
+  DOWN: 40
 };
 
 function vector(x, y) {
@@ -67,7 +65,13 @@ Pong.prototype = {
   init: function() {
     console.log("init");
     this.attachEvents();
-    this.runLoop();
+    var self = this;
+    socket.emit("join");
+    socket.on("ready", function(gameInit) {
+       self.player = gameInit[socket.socket.sessionid];
+       console.log("Game ready, I am player", self.player);
+       self.runLoop();
+    });
   },
 
   attachEvents: function() {
@@ -75,9 +79,8 @@ Pong.prototype = {
     window.addEventListener("keydown", function(e) {
       self.handleKeyPress(e.keyCode);
     });
-    socket.on("playera", function(msg) {
-      console.log(msg);
-      self.playerA.velocity = msg.velocity;
+    socket.on("move", function(msg) {
+      self[msg.player].velocity = msg.velocity;
     });
   },
 
@@ -103,6 +106,7 @@ Pong.prototype = {
 
   startMatch: function() {
     console.log("start match");
+    this.state.serve = null;
     // reset ball location and velocity
     this.ball.rect.origin = vector(320, 240);
     this.ball.velocity = vector(5, 5);
@@ -112,20 +116,13 @@ Pong.prototype = {
   },
 
   handleKeyPress: function(keyCode) {
+    if(!this.player) return;
     switch(keyCode) {
-      case controls.A_UP:
-        this.playerA.velocity = -10;
+      case controls.UP:
+        socket.emit("move", {player: "player"+this.player, velocity: -10});
         break;
-      case controls.A_DOWN:
-        this.playerA.velocity = 10;
-        break;
-     case controls.B_UP:
-        this.playerB.velocity = -10;
-        break;
-      case controls.B_DOWN:
-        this.playerB.velocity = 10;
-        break;
-      default:
+      case controls.DOWN:
+        socket.emit("move", {player: "player"+this.player, velocity: 10});
         break;
     }
   },
@@ -214,3 +211,7 @@ function init() {
   console.log("Starting pong.js");
   var game = new Pong(document.getElementById("pong"));
 };
+
+function reset() {
+  socket.emit("reset");
+}

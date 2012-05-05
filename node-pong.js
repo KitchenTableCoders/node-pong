@@ -21,6 +21,7 @@ var server = net.createServer(function(socket) {
     if(parts.length > 1) {
       buffer = parts[1]; // subtle bug
       values = parts[0].split("\t");
+      console.log("Player a moves:", values[0]);
       if(values[0] < 450) {
         io.sockets.emit("playera", {velocity:-10});
       } if(values [0] > 550) {
@@ -37,11 +38,36 @@ server.listen(5001, function() {
   console.log("Controller server bound");
 });
 
+var playerCount = 0;
+var gameInit = {};
+
 // Server for WebSockets
 io.sockets.on('connection', function (websocket) {
-  websocket.emit('init', function() {});
-  websocket.on('move', function(loc) {
+  websocket.on('reset', function() {
+    playerCount = 0;
+    gameInit = {};
   });
+
+  websocket.on('join', function(loc) {
+    playerCount++;
+    if(playerCount > 2) {
+      console.log("Oops! Game is full!");
+      return;
+    }
+    if(playerCount == 1) {
+      console.log("We have one player", websocket.id);
+      gameInit[websocket.id] = "A";
+    } else {
+      console.log("We have two players", websocket.id);
+      gameInit[websocket.id] = "B";
+      io.sockets.emit('ready', gameInit);
+    }
+  });
+
+  websocket.on('move', function(msg) {
+    io.sockets.emit('move', msg);
+  });
+
   websocket.on('playera-win', function() {
     console.log("PLAYER A WIN!");
     if(thumbstick) {
@@ -76,5 +102,5 @@ function handleRequest(req, res){
 }
 
 var http = require('http');
-http.createServer(handleRequest).listen(8080, "localhost");
+http.createServer(handleRequest).listen(8080, "10.0.25.103"); // remember to change
 console.log('Server running at 8080');
