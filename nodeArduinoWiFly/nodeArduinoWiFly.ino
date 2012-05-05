@@ -23,8 +23,8 @@ int vert = 0;
 int hor = 0;
 bool push;
 
-char* ssid = "Vibromonk2";
-char* pass = "VibroMonk718";
+char* ssid = "yourSSID";
+char* pass = "yourPassword";
 
 char* serverAddress = "10.0.25.103";
 int serverPort = 5001;
