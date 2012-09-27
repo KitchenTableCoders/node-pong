@@ -20,6 +20,7 @@ int vert = 0;
 int hor = 0;
 bool push;
 
+<<<<<<< HEAD
 void blinkLED(int blinkTimes){
   // for status indication
   for(int i=0; i<blinkTimes; i++){
@@ -29,6 +30,16 @@ void blinkLED(int blinkTimes){
     delay(100);
   }
 }
+=======
+char* ssid = "yourSSID";
+char* pass = "yourPassword";
+
+char* serverAddress = "10.0.25.103";
+int serverPort = 5001;
+
+//Client client(serverAddress, serverPort);
+WiFlyClient client;
+>>>>>>> b18c1d9b684b7b01150b9608f96ae6555de9aa65
 
 void setup(){
   pinMode(PIN_PUSH, INPUT);
