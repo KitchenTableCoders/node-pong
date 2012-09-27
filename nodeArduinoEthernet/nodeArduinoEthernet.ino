@@ -26,11 +26,11 @@ unsigned long eventTime;
 byte mac[] = {  
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 
-  192,168,1,15 };
+  10,0,25,15 };
 
 // Enter the IP address of the server you're connecting to:
 byte server[] = { 
-  192,168,1,103 }; 
+  10,0,25,103 }; 
 
 String buffer = "";
 

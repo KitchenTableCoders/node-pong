@@ -8,9 +8,6 @@ Uses WiFly Shield Library: https://github.com/jcrouchley/WiFly-Shield
 
 ******/
 
-#include <SPI.h>
-#include <WiFly.h>
-
 #define PIN_VERT      0  // analog
 #define PIN_HOR       1  // analog
 
@@ -23,14 +20,15 @@ int vert = 0;
 int hor = 0;
 bool push;
 
-char* ssid = "Vibromonk2";
-char* pass = "VibroMonk718";
-
-char* serverAddress = "10.0.25.103";
-int serverPort = 5001;
-
-//Client client(serverAddress, serverPort);
-WiFlyClient client;
+void blinkLED(int blinkTimes){
+  // for status indication
+  for(int i=0; i<blinkTimes; i++){
+    digitalWrite(PIN_LED_STATUS, HIGH);
+    delay(100);
+    digitalWrite(PIN_LED_STATUS, LOW);
+    delay(100);
+  }
+}
 
 void setup(){
   pinMode(PIN_PUSH, INPUT);
@@ -42,40 +40,33 @@ void setup(){
   digitalWrite(PIN_LED_RED, LOW);  // start off
   digitalWrite(PIN_LED_GRN, LOW);
   
-  Serial.begin(9600);
-  WiFly.setUart(&Serial);
-  WiFly.begin();
+  blinkLED(2);
   
-  if (!WiFly.join(ssid, pass, true)) {
-    digitalWrite(PIN_LED_RED, HIGH);
-    while (1) {
-      // Hang on failure.
-    }
-  }
+  Serial.begin(38400);
   
+  delay(70000);  // wait for WiFly to get connected
+  blinkLED(5);
+
+  Serial.print("$$$");
+  delay(250);
+  Serial.println("open 169.254.119.182 5001");
+  delay(500);
+ 
+  digitalWrite(PIN_LED_STATUS, HIGH);
   digitalWrite(PIN_LED_GRN, HIGH);
-  
-  if (client.connect(serverAddress, serverPort)) {
-    client.println("ohai!");
-    client.println();
-    digitalWrite(PIN_LED_STATUS, HIGH);
-  } else {
-    // do nothing
-  }
 }
 
 void loop(){
   vert = analogRead(PIN_VERT);
   hor = analogRead(PIN_HOR);
   push = digitalRead(PIN_PUSH);
-  
-  digitalWrite(PIN_LED_RED, !push);
-  
-  client.print(vert);
-  client.print('\t');
-  client.print(hor);
-  client.print('\t');
-  client.print(push);
-  client.println();
-  delay(10);
+
+  Serial.print(vert);
+  Serial.print('\t');
+  Serial.print(hor);
+  Serial.print('\t');
+  Serial.print(push);
+  Serial.println();
+
+  delay(100);
 }

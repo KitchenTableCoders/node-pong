@@ -79,6 +79,10 @@ Pong.prototype = {
       console.log(msg);
       self.playerA.velocity = msg.velocity;
     });
+    socket.on("joystick-connected", function(msg){
+      console.log("Joystick Connected");
+      document.getElementById("messages").innerHTML = "Joystick Connected!";
+    });
   },
 
   runLoop: function() {
@@ -114,16 +118,16 @@ Pong.prototype = {
   handleKeyPress: function(keyCode) {
     switch(keyCode) {
       case controls.A_UP:
-        this.playerA.velocity = -10;
+        this.playerA.velocity = -20;
         break;
       case controls.A_DOWN:
-        this.playerA.velocity = 10;
+        this.playerA.velocity = 20;
         break;
      case controls.B_UP:
-        this.playerB.velocity = -10;
+        this.playerB.velocity = -20;
         break;
       case controls.B_DOWN:
-        this.playerB.velocity = 10;
+        this.playerB.velocity = 20;
         break;
       default:
         break;

@@ -8,71 +8,81 @@ var net = require('net');
 
 // Server for the controller
 
-var thumbstick;
+var joySocket;   // holds a reference to the socket that a joystick connected to
+var webSocketRef;
 
-var server = net.createServer(function(socket) {
-  console.log("Client connected");
-  thumbstick = socket;
-  socket.setEncoding("ascii");
+var joystickServer = net.createServer(function(socket) {
+  console.log("Joystick connected");
+  if(webSocketRef){
+    webSocketRef.emit('joystick-connected', function(){});
+  }
+  joySocket = socket;
+  joySocket.setEncoding("ascii");
   var buffer = "";
-  socket.on("data", function(data) {
+
+  joySocket.on("data", function(data) {
     buffer += data;
     var parts = buffer.split("\n");
     if(parts.length > 1) {
       buffer = parts[1]; // subtle bug
       values = parts[0].split("\t");
       if(values[0] < 450) {
-        io.sockets.emit("playera", {velocity:-10});
+        io.sockets.emit("playera", {velocity:-20});
       } if(values [0] > 550) {
-        io.sockets.emit("playera", {velocity:10});
+        io.sockets.emit("playera", {velocity:20});
       }
     }
   });
-  socket.on("end", function() {
-    console.log("client disconnected");
+
+  joySocket.on("end", function() {
+    console.log("Joystick disconnected");
   });
 });
 
-server.listen(5001, function() {
-  console.log("Controller server bound");
+joystickServer.listen(5001, function() {
+  console.log("Joystick server bound on port 5001");
 });
 
 // Server for WebSockets
 io.sockets.on('connection', function (websocket) {
+  webSocketRef = websocket;
   websocket.emit('init', function() {});
   websocket.on('move', function(loc) {
   });
+
   websocket.on('playera-win', function() {
     console.log("PLAYER A WIN!");
-    if(thumbstick) {
+    if(joySocket) {
       console.log("writing out win");
-      thumbstick.write("win\n");
+      joySocket.write("win\n");
     }
   });
+
   websocket.on('playera-loss', function() {
     console.log("PLAYER A LOSS!");
-    if(thumbstick) {
+    if(joySocket) {
       console.log("writing out loss")
-      thumbstick.write("lose\n");
+      joySocket.write("lose\n");
     }
   });
+
   websocket.on('disconnect', function() {
     console.log("disconnected");
   });
 });
 
 function handleRequest(req, res){
- var pathname = url.parse(req.url).pathname,
+  var pathname = url.parse(req.url).pathname,
      components = pathname.split('/');
-     
- if(components[1] == 'public') {
-   fileServer.serve(req, res);
- } else if(pathname == '/') {
-   fileServer.serveFile('/index.html', 200, {'Content-Type':'text/html'}, req, res);
- } else {
-   res.writeHead(404, {'Content-Type': 'text/plain'});
-   res.end('Page Not Found');
- }
+  
+  if(components[1] == 'public') {
+    fileServer.serve(req, res);
+  } else if(pathname == '/') {
+    fileServer.serveFile('/index.html', 200, {'Content-Type':'text/html'}, req, res);
+  } else {
+    res.writeHead(404, {'Content-Type': 'text/plain'});
+    res.end('Page Not Found');
+  }
 }
 
 var http = require('http');
